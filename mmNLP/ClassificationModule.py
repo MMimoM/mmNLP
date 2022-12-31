@@ -14,9 +14,9 @@ import torch.optim as optim
 import torch.nn.functional as F
 
 #Network architectures
-from . import TxTArchitectures
-from . import TxT
-from . import WordVectors
+from mmNLP.TextModule import TxT
+from mmNLP.WordVectorsModule import WordVectors
+from mmNLP.Architectures import TxTArchitectures
 
 #Xgboost
 import xgboost as xgb
@@ -95,15 +95,15 @@ class TxTClassification(object):
                                                      embedding_parameter = embedding_parameter)
                 
                 if self.nn_parameter is not None:
-                    if self.nn_parameter['embedding_size'] != self.eWordVectorsObject.embedding_parameter['embedding_size']:
+                    if self.nn_parameter['embedding_size'] != self.WordVectorsObject.embedding_parameter['embedding_size']:
                         raise TypeError('embedding size from nn_parameter and embedding_parameter must be equal')
                 
-                self.embedding = self.eWordVectorsObject.getEmbeddings()
+                self.embedding = self.WordVectorsObject.getEmbeddings()
             else:
-                self.eWordVectorsObject = None
+                self.WordVectorsObject = None
                 self.embedding = None
         else:
-            self.eWordVectorsObject = None
+            self.WordVectorsObject = None
             self.embedding = None
             
         
@@ -116,7 +116,7 @@ class TxTClassification(object):
                 self.embedding = torch.tensor(self.embedding)
             
             if nnClass is None:
-                self.classifier = TxTArchitectures(vocab_size = self.eTxTobject_train.vocab_size,
+                self.classifier = TxTArchitectures(vocab_size = self.TxTobject_train.vocab_size,
                                                    nn_parameter = self.nn_parameter,
                                                    num_classes = self.num_classes,
                                                    pretrained_embedding = self.embedding,
@@ -341,7 +341,7 @@ class TxTClassification(object):
         elif self.classification_method == 'xgboost':
             
             if self.use_pretrained_embedding:
-                txt_lines = self.eWordVectorsObject.getEmbeddings(list_of_sentences = txt_lines,
+                txt_lines = self.WordVectorsObject.getEmbeddings(list_of_sentences = txt_lines,
                                                                   sentence_vectors=True)
                 
             else:

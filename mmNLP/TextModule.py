@@ -17,19 +17,27 @@ class TxT(object):
                  ):
         
         """
-
         Parameters:
-        ----------
-        txt_lines : Pandas Series 
-            Each line is a text string that represents a document.
-        path : String
-            Path for saving and loading a vocabulary
-        label : Pandas Series, optional
-            Each line represents the associated label for the document in txt_lines. The default is None.
-        preprocessor : function, optional
-            Function for preprocessing the text data. The default is None.
-        ----------
-
+            ----------
+            txt_lines : Pandas Series 
+                Each line is a text string that represents a document.
+            path : String
+                Path for saving and loading a vocabulary
+            label : Pandas Series, optional
+                Each line represents the associated label for the document in txt_lines. The default is None.
+            tokenizer : function, optional
+                Function for tokenizing the text data. The default is None, which uses the spacy tokenizer.
+            encode_label : bool, optional
+                Indicates whether to encode the labels as integers. The default is True.
+            preprocessor : function, optional
+                Function for preprocessing the text data. The default is None.
+            drop_null : bool, optional
+                Indicates whether to drop rows with null values in the txt_lines or label series. The default is False.
+            min_words_in_sentence : bool, optional
+                Indicates whether to remove sentences with fewer than a certain number of words. The default is False.
+            build_vocab : bool, optional
+                Indicates whether to build the vocabulary for the text data. The default is True.
+            ----------
         """
         
         self.txt_lines = txt_lines
@@ -53,19 +61,18 @@ class TxT(object):
             
             if encode_label:
                 try:
-                    file = open(self.path + '/encoder.pkl', 'rb')
-                    self.encoder = pickle.load(file)
-                    file.close()
-                    
+                    with open(self.path + "/encoder.pkl", "rb") as file:
+                        self.encoder = pickle.load(file)
+                        
                     self.encoded_label = self.encoder.transform(self.label)
+                    
                 except OSError:
                     self.encoder = LabelEncoder()
                     self.encoder.fit(self.label)
                     self.encoded_label = self.encoder.transform(self.label)
                     
-                    file = open(self.path + '/encoder.pkl', 'wb')
-                    pickle.dump(self.encoder, file)
-                    file.close()
+                    with open(self.path + "/encoder.pkl", "wb") as file:
+                        pickle.dump(self.encoder, file)
             else:
                 self.encoded_label = label
             
@@ -110,9 +117,8 @@ class TxT(object):
                     vocabulary[token] = index
                     index += 1
         
-        file = open(self.path + '/vocabulary.pkl','wb')
-        pickle.dump(vocabulary,file)
-        file.close()
+        with open(self.path + "/vocabulary.pkl", "wb") as file:
+            pickle.dump(vocabulary, file)
                     
         return vocabulary
     

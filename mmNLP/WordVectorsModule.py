@@ -10,7 +10,7 @@ from fasttext import FastText
 from scipy.spatial import distance
 
 #Network architectures
-from . import TxT
+from mmNLP.TextModule import TxT
 
 class WordVectors(object):
     def __init__(self,
